@@ -1,22 +1,21 @@
 import React, { createContext, useContext, useReducer, ReactNode } from 'react';
 import { createRandomEvent, EventType } from '../utils';
 
+interface EditingCell {
+  index: number;            
+  key: 'value1' | 'value2'; 
+}
 interface LiveChartState {
   events: EventType[];
   paused: boolean;
+  editingCell: EditingCell | null; 
 }
 
 type LiveChartAction =
   | { type: 'new_event'; payload: EventType }
   | { type: 'toggle_pause' }
-  | {
-    type: 'edit_value';
-    payload: { 
-      index: number;
-      key: 'value1' | 'value2';
-      newValue: number;
-     };
-  };
+  | { type: 'start_edit'; payload: EditingCell } 
+  | { type: 'edit_value'; payload: { newValue: number } } 
 
 interface LiveChartContextType {
   data: LiveChartState;
@@ -27,7 +26,8 @@ const initialEvents: EventType[] = Array.from({ length: 50 }, (_, ix) => createR
 
 const initialData: LiveChartState = {
   events: initialEvents,
-  paused: false, 
+  paused: false,
+  editingCell: null, 
 };
 
 const LiveChartContext = createContext<LiveChartContextType | undefined>(undefined);
@@ -35,21 +35,26 @@ const LiveChartContext = createContext<LiveChartContextType | undefined>(undefin
 const liveChartReducer = (state: LiveChartState, action: LiveChartAction): LiveChartState => {
   switch (action.type) {
     case 'new_event':
-      if (state.paused) {
-        return state;
-      }
+      if (state.paused) return state;
       return {
         ...state,
         events: [...state.events, action.payload],
       };
 
     case 'toggle_pause':
+      return { ...state, paused: !state.paused };
+
+    case 'start_edit':
       return {
         ...state,
-        paused: !state.paused,
+        editingCell: action.payload,
       };
+
     case 'edit_value': {
-      const { index, key, newValue } = action.payload;
+      if (!state.editingCell) return state; 
+      const { index, key } = state.editingCell;
+      const { newValue } = action.payload;
+
       return {
         ...state,
         events: state.events.map((ev) =>
@@ -57,7 +62,8 @@ const liveChartReducer = (state: LiveChartState, action: LiveChartAction): LiveC
             ? { ...ev, [key]: newValue }
             : ev
         ),
-      }
+        editingCell: null,
+      };
     }
 
     default:
@@ -78,7 +84,7 @@ export const LiveChartProvider: React.FC<{ children?: ReactNode }> = ({ children
 export const useLiveChartContext = () => {
   const context = useContext(LiveChartContext);
   if (!context) {
-    throw new Error('useLiveChartContext should be used within a LiveChartProvider');
+    throw new Error('useLiveChartContext must be used within a LiveChartProvider');
   }
   return context;
 };

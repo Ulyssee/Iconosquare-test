@@ -10,6 +10,19 @@ const LiveChart = () => {
   const handleTogglePause = () => {
     dispatch({ type: 'toggle_pause' });
   };
+  
+    const handleChartClick = (e: any) => {
+      const indexInFiltered = e?.activeTooltipIndex;
+      if (indexInFiltered !== undefined && indexInFiltered !== null) {
+        const clickedEvent = eventsFiltered[indexInFiltered];
+        if (clickedEvent) {
+          dispatch({
+            type: 'start_edit',
+            payload: { index: clickedEvent.index, key: 'value1' },
+          });
+        }
+      }
+    };
 
   return (
     <div className="mb-8">
@@ -22,8 +35,8 @@ const LiveChart = () => {
 
       <ResponsiveContainer height={250}>
         <AreaChart
-          onClick={(e) => console.log(e.activeTooltipIndex)}
           data={eventsFiltered}
+          onClick={handleChartClick}
           margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
         >
           <defs>
