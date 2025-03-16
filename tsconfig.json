@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "allowJs": true, 
+    "moduleResolution": "Node",
+    "baseUrl": "./src",
+    "paths": {
+      "@components/*": ["components/*"],
+      "@utils/*": ["utils/*"]
+    },
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"],
+}

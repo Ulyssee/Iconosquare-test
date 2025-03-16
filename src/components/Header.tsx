@@ -6,7 +6,7 @@ const Header = () => {
         <div className="bg-white py-12">
             <div className="mx-auto max-w-7xl px-8">
                 <div className="mx-auto max-w-2xl lg:mx-0">
-                    <h1 className="text-3xl font-bold tracking-tight text-gray-900 flex items-center space-x-4"><Logo size="40" /> <span>Iconosquare - React technical test</span></h1>
+                    <h1 className="text-3xl font-bold tracking-tight text-gray-900 flex items-center space-x-4"><Logo size={40} /> <span>Iconosquare - React technical test</span></h1>
                     <div className="text-gray-600 text-lg leading-8">
                         <p className="my-6 ">
                             The following graph is a simulation of a live stream of events that refreshes every 2s. 
