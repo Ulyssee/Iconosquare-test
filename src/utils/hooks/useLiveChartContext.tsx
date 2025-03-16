@@ -8,7 +8,15 @@ interface LiveChartState {
 
 type LiveChartAction =
   | { type: 'new_event'; payload: EventType }
-  | { type: 'toggle_pause' };
+  | { type: 'toggle_pause' }
+  | {
+    type: 'edit_value';
+    payload: { 
+      index: number;
+      key: 'value1' | 'value2';
+      newValue: number;
+     };
+  };
 
 interface LiveChartContextType {
   data: LiveChartState;
@@ -40,6 +48,17 @@ const liveChartReducer = (state: LiveChartState, action: LiveChartAction): LiveC
         ...state,
         paused: !state.paused,
       };
+    case 'edit_value': {
+      const { index, key, newValue } = action.payload;
+      return {
+        ...state,
+        events: state.events.map((ev) =>
+          ev.index === index
+            ? { ...ev, [key]: newValue }
+            : ev
+        ),
+      }
+    }
 
     default:
       throw new Error(`Unhandled action type: ${action}`);
