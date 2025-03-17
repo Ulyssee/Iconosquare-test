@@ -1,11 +1,15 @@
 import React from 'react';
-import { Area, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import {Area, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis, ResponsiveContainer} from 'recharts';
 import { useLiveChartContext } from '../utils/hooks/useLiveChartContext';
 
 const LiveChart = () => {
   const { data, dispatch } = useLiveChartContext();
-  const nbTotalEvents = data.events.length;
-  const eventsFiltered = data.events.slice(Math.max(nbTotalEvents - 20, 0), nbTotalEvents);
+  const { events, paused, offset, chartSize } = data;
+
+  const total = events.length;
+  const start = Math.max(0, total - offset - chartSize);
+  const end = Math.max(0, total - offset);
+  const eventsFiltered = events.slice(start, end);
 
   const handleTogglePause = () => {
     dispatch({ type: 'toggle_pause' });
@@ -17,31 +21,50 @@ const LiveChart = () => {
 
   const handleChartClick = (e: any) => {
     const indexInFiltered = e?.activeTooltipIndex;
-    if (indexInFiltered !== undefined && indexInFiltered !== null) {
+    if (indexInFiltered != null) {
       const clickedEvent = eventsFiltered[indexInFiltered];
       if (clickedEvent) {
-        dispatch({
-          type: 'start_edit',
-          payload: { index: clickedEvent.index, key: 'value1' },
-        });
+        dispatch({ type: 'start_edit', payload: { index: clickedEvent.index, key: 'value1' } });
       }
     }
+  };
+  
+  const maxOffset = Math.max(0, total - chartSize);
+  const handleOffsetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch({ type: 'set_offset', payload: Number(e.target.value) });
+  };
+
+  const handleChartSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch({ type: 'set_chart_size', payload: Number(e.target.value) });
   };
 
   return (
     <div className="mb-8">
-      <button
-        onClick={handleTogglePause}
-        className="mb-4 px-4 py-2 border rounded bg-gray-100"
-      >
-        {data.paused ? 'Play' : 'Pause'}
-      </button>
-      <button 
-        onClick={handleReset} 
-        className="mb-4 px-4 py-2 border rounded bg-gray-100"
+      <div className="flex space-x-2 mb-4">
+        <button
+          onClick={handleTogglePause}
+          className="px-4 py-2 border rounded bg-gray-100"
+        >
+          {paused ? 'Play' : 'Pause'}
+        </button>
+        <button
+          onClick={handleReset}
+          className="px-4 py-2 border rounded bg-gray-100"
         >
           Reset
-      </button>
+        </button>
+      </div>
+
+      <div className="flex items-center space-x-2 mb-4">
+        <input
+          type="range"
+          min={5}
+          max={100}
+          value={chartSize}
+          onChange={handleChartSizeChange}
+        />
+        <span>Chart Size: {chartSize} index</span>
+      </div>
 
       <ResponsiveContainer height={250}>
         <AreaChart
@@ -81,6 +104,16 @@ const LiveChart = () => {
           />
         </AreaChart>
       </ResponsiveContainer>
+
+      <div className="mt-4">
+        <input
+          type="range"
+          min={0}
+          max={maxOffset}
+          value={offset}
+          onChange={handleOffsetChange}
+        />
+      </div>
     </div>
   );
 };
