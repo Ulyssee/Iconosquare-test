@@ -1,5 +1,5 @@
 import React from 'react';
-import {Area, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis, ResponsiveContainer} from 'recharts';
+import { Area, AreaChart, CartesianGrid, Tooltip, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import { useLiveChartContext } from '../utils/hooks/useLiveChartContext';
 
 const LiveChart = () => {
@@ -28,7 +28,7 @@ const LiveChart = () => {
       }
     }
   };
-  
+
   const maxOffset = Math.max(0, total - chartSize);
   const handleOffsetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ type: 'set_offset', payload: Number(e.target.value) });
@@ -40,21 +40,23 @@ const LiveChart = () => {
 
   return (
     <div className="mb-8">
+      {/* Boutons Pause & Reset */}
       <div className="flex space-x-2 mb-4">
         <button
           onClick={handleTogglePause}
-          className="px-4 py-2 border rounded bg-gray-100"
+          className="px-4 py-2 border rounded"
         >
           {paused ? 'Play' : 'Pause'}
         </button>
         <button
           onClick={handleReset}
-          className="px-4 py-2 border rounded bg-gray-100"
+          className="px-4 py-2 border rounded"
         >
           Reset
         </button>
       </div>
 
+      {/* Slider pour ajuster la taille de la fenêtre du graphique */}
       <div className="flex items-center space-x-2 mb-4">
         <input
           type="range"
@@ -66,45 +68,56 @@ const LiveChart = () => {
         <span>Chart Size: {chartSize} index</span>
       </div>
 
-      <ResponsiveContainer height={250}>
-        <AreaChart
-          data={eventsFiltered}
-          onClick={handleChartClick}
-          margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-        >
-          <defs>
-            <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-            </linearGradient>
-            <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <XAxis dataKey="index" />
-          <YAxis />
-          <CartesianGrid strokeDasharray="3 3" />
-          <Tooltip />
-          <Area
-            isAnimationActive={false}
-            type="monotone"
-            dataKey="value1"
-            stroke="#8884d8"
-            fillOpacity={1}
-            fill="url(#colorUv)"
-          />
-          <Area
-            isAnimationActive={false}
-            type="monotone"
-            dataKey="value2"
-            stroke="#82ca9d"
-            fillOpacity={1}
-            fill="url(#colorPv)"
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+      {/* Graphique avec overlay PAUSE */}
+      <div className="relative">
+        <ResponsiveContainer height={250}>
+          <AreaChart
+            data={eventsFiltered}
+            onClick={handleChartClick}
+            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+          >
+            <defs>
+              <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <XAxis dataKey="index" />
+            <YAxis />
+            <CartesianGrid strokeDasharray="3 3" />
+            <Tooltip />
+            <Area
+              isAnimationActive={false}
+              type="monotone"
+              dataKey="value1"
+              stroke="#8884d8"
+              fillOpacity={1}
+              fill="url(#colorUv)"
+            />
+            <Area
+              isAnimationActive={false}
+              type="monotone"
+              dataKey="value2"
+              stroke="#82ca9d"
+              fillOpacity={1}
+              fill="url(#colorPv)"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
 
+        {/* Overlay "PAUSED" visible uniquement lorsque la pause est activée */}
+        {paused && (
+          <div className="absolute top-2 right-2 bg-gray-900 text-white text-xs font-bold px-3 py-1 rounded-md opacity-80">
+            ⏸ PAUSED
+          </div>
+        )}
+      </div>
+
+      {/* Barre de navigation pour parcourir les événements */}
       <div className="mt-4">
         <input
           type="range"
