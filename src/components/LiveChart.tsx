@@ -10,19 +10,23 @@ const LiveChart = () => {
   const handleTogglePause = () => {
     dispatch({ type: 'toggle_pause' });
   };
-  
-    const handleChartClick = (e: any) => {
-      const indexInFiltered = e?.activeTooltipIndex;
-      if (indexInFiltered !== undefined && indexInFiltered !== null) {
-        const clickedEvent = eventsFiltered[indexInFiltered];
-        if (clickedEvent) {
-          dispatch({
-            type: 'start_edit',
-            payload: { index: clickedEvent.index, key: 'value1' },
-          });
-        }
+
+  const handleReset = () => {
+    dispatch({ type: 'reset_values' });
+  };
+
+  const handleChartClick = (e: any) => {
+    const indexInFiltered = e?.activeTooltipIndex;
+    if (indexInFiltered !== undefined && indexInFiltered !== null) {
+      const clickedEvent = eventsFiltered[indexInFiltered];
+      if (clickedEvent) {
+        dispatch({
+          type: 'start_edit',
+          payload: { index: clickedEvent.index, key: 'value1' },
+        });
       }
-    };
+    }
+  };
 
   return (
     <div className="mb-8">
@@ -31,6 +35,12 @@ const LiveChart = () => {
         className="mb-4 px-4 py-2 border rounded bg-gray-100"
       >
         {data.paused ? 'Play' : 'Pause'}
+      </button>
+      <button 
+        onClick={handleReset} 
+        className="mb-4 px-4 py-2 border rounded bg-gray-100"
+        >
+          Reset
       </button>
 
       <ResponsiveContainer height={250}>

@@ -9,6 +9,7 @@ interface LiveChartState {
   events: EventType[];
   paused: boolean;
   editingCell: EditingCell | null; 
+  resetEvents: EventType[];
 }
 
 type LiveChartAction =
@@ -16,6 +17,7 @@ type LiveChartAction =
   | { type: 'toggle_pause' }
   | { type: 'start_edit'; payload: EditingCell } 
   | { type: 'edit_value'; payload: { newValue: number } } 
+  | { type:'reset_values' };
 
 interface LiveChartContextType {
   data: LiveChartState;
@@ -28,6 +30,7 @@ const initialData: LiveChartState = {
   events: initialEvents,
   paused: false,
   editingCell: null, 
+  resetEvents: [...initialEvents],
 };
 
 const LiveChartContext = createContext<LiveChartContextType | undefined>(undefined);
@@ -65,6 +68,12 @@ const liveChartReducer = (state: LiveChartState, action: LiveChartAction): LiveC
         editingCell: null,
       };
     }
+
+    case'reset_values':
+    return {
+       ...state,
+        events: [...state.resetEvents]
+      };
 
     default:
       throw new Error(`Unhandled action type: ${action}`);
